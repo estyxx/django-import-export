@@ -1137,10 +1137,9 @@ class ModelResource(Resource, metaclass=ModelDeclarativeMetaclass):
         Returns a queryset of all objects for this model. Override this if you
         want to limit the returned queryset.
         """
-        qs = self.model._default_manager.get_queryset()
+        qs = self._meta.model._default_manager.get_queryset()
         return qs
 
-        return self._meta.model.objects.all()
 
     def init_instance(self, row=None):
         """
