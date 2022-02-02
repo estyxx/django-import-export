@@ -923,7 +923,7 @@ class Resource(metaclass=DeclarativeMetaclass):
         else:
             yield from queryset.iterator(chunk_size=self.get_chunk_size())
 
-    def export(self, queryset=None, *args, **kwargs):
+    def export(self, queryset=None, request=None, *args, **kwargs):
         """
         Exports a resource.
         """
@@ -931,7 +931,7 @@ class Resource(metaclass=DeclarativeMetaclass):
         self.before_export(queryset, *args, **kwargs)
 
         if queryset is None:
-            queryset = self.get_queryset()
+            queryset = self.get_queryset(request)
         headers = self.get_export_headers()
         data = tablib.Dataset(headers=headers)
 
@@ -1132,11 +1132,14 @@ class ModelResource(Resource, metaclass=ModelDeclarativeMetaclass):
         )
         return field
 
-    def get_queryset(self):
+    def get_queryset(self, request=None):
         """
         Returns a queryset of all objects for this model. Override this if you
         want to limit the returned queryset.
         """
+        qs = self.model._default_manager.get_queryset()
+        return qs
+
         return self._meta.model.objects.all()
 
     def init_instance(self, row=None):
